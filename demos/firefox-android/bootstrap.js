@@ -70,9 +70,9 @@ var menuItemId;
 
 function loadIntoWindow(window) {
   menuItemId = window.NativeWindow.menu.add({
-    name: "My awesome action",
+    name: "Cats!",
     callback: function() {
-      window.BrowserApp.addTab("https://www.mozilla.org");
+      window.BrowserApp.addTab("https://www.google.com/search?q=cat&tbm=isch");
     }
   });
 }

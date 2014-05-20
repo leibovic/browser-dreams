@@ -6,12 +6,10 @@ var button = buttons.ActionButton({
   id: "mozilla-link",
   label: "Visit Mozilla",
   icon: {
-    "16": "./icon-16.png",
-    "32": "./icon-32.png",
-    "64": "./icon-64.png"
+    "32": "./nyan.png",
   },
   onClick: function handleClick(state) {
-    tabs.open("https://www.mozilla.org/");
+    tabs.open("https://www.google.com/search?q=cat&tbm=isch");
   }
 });
 
