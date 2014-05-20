@@ -1,0 +1,28 @@
+{
+  "manifest_version": 2,
+
+  "name": "My awesome extension",
+  "description": "This extension is awesome.",
+  "version": "1.0",
+
+  "permissions": [
+
+  ],
+
+  "browser_action": {
+    "default_icon": "icon.png"
+  },
+
+  "background": {
+    "scripts": [ "background.js" ],
+    "persistent": false
+  },
+
+  "content_scripts": [
+    {
+      "matches": [ "<all_urls>" ],
+      "js": [ "image-swap.js" ],
+      "run_at": "document_end"
+    }
+  ]
+}

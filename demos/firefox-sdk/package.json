@@ -1,0 +1,9 @@
+{
+  "name": "awesome-addon",
+  "title": "My awesome add-on",
+  "id": "jid1-qcHfvI6LDQWiVg",
+  "description": "This add-on is awesome.",
+  "author": "",
+  "license": "MPL 2.0",
+  "version": "0.1"
+}
