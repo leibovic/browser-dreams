@@ -28,10 +28,10 @@ function handleChange(state) {
   }
 }
 
-var buttons = require("sdk/ui/button/action");
+var { ActionButton } = require("sdk/ui/button/action");
 var tabs = require("sdk/tabs");
 
-var button = buttons.ActionButton({
+var button = ActionButton({
   id: "mozilla-link",
   label: "Cats!",
   icon: {
