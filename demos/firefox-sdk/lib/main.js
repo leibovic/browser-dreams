@@ -4,9 +4,9 @@ var pageMod = require("sdk/page-mod");
 
 var button = buttons.ActionButton({
   id: "mozilla-link",
-  label: "Visit Mozilla",
+  label: "Cats!",
   icon: {
-    "32": "./nyan.png",
+    "32": "./icon.png",
   },
   onClick: function handleClick(state) {
     tabs.open("https://www.google.com/search?q=cat&tbm=isch");

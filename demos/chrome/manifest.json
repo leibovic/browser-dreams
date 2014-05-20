@@ -10,7 +10,7 @@
   ],
 
   "browser_action": {
-    "default_icon": "nyan.png"
+    "default_icon": "icon.png"
   },
 
   "background": {
