@@ -2,17 +2,20 @@ const { classes: Cc, interfaces: Ci, utils: Cu } = Components;
 
 Cu.import("resource://gre/modules/Home.jsm");
 Cu.import("resource://gre/modules/HomeProvider.jsm");
-Cu.import("resource://gre/modules/Messaging.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/Task.jsm");
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+
+/**
+ * Logic to control a new home panel.
+ */
 
 const PANEL_ID = "myawesomepanel@margaretleibovic.com";
 const DATASET_ID = "myawesomedata@margaretleibovic.com";
 const PANEL_TITLE = "My awesome panel";
-const FEED_URL = "http://api.flickr.com/services/feeds/photos_public.gne?tags=kittens&format=json";
+const KITTENS_URL = "http://api.flickr.com/services/feeds/photos_public.gne?tags=kittens&format=json";
 
-function optionsCallback() {
+// Used to configure home panel.
+function panelOptionsCallback() {
   return {
     title: PANEL_TITLE,
     views: [{
@@ -27,6 +30,7 @@ function fetchFlickrJson(url, onFinish) {
   xhr.open("GET", url, true);
   xhr.onload = function onload(event) {
     if (xhr.status === 200) {
+      // Handle JSONP response.
       let response = null;
       let jsonFlickrFeed = function(r){
         response = r;
@@ -39,7 +43,8 @@ function fetchFlickrJson(url, onFinish) {
 }
 
 function refreshDataset() {
-  fetchFlickrJson(FEED_URL, function(response) {
+  fetchFlickrJson(KITTENS_URL, function(response) {
+    // Format items the way we want to store them.
     let items = response.items.map(function(item) {
       return {
         url: item.link,
@@ -81,6 +86,7 @@ function unloadFromWindow(window) {
   window.NativeWindow.menu.remove(menuItemId);
 }
 
+// Boilerplate code to listen for browser windows being loaded.
 var WindowListener = {
   init: function() {
     let windows = Services.wm.getEnumerator("navigator:browser");
@@ -113,7 +119,6 @@ var WindowListener = {
   onWindowTitleChange: function(window, title) {}
 };
 
-
 /**
  * bootstrap.js API
  * https://developer.mozilla.org/en-US/Add-ons/Bootstrapped_extensions
@@ -122,7 +127,7 @@ function startup(data, reason) {
   WindowListener.init();
 
   // Always register your panel on startup.
-  Home.panels.register(PANEL_ID, optionsCallback);
+  Home.panels.register(PANEL_ID, panelOptionsCallback);
 
   switch(reason) {
     case ADDON_INSTALL:

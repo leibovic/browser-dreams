@@ -23,3 +23,5 @@ adb shell am start -a android.intent.action.VIEW \
                    -d file:///mnt/sdcard/"$XPI" \
                    -n $ANDROID_APP_ID/.App && \
 echo Pushed $XPI to $ANDROID_APP_ID
+
+rm $XPI

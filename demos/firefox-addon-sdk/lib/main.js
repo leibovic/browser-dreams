@@ -1,6 +1,5 @@
 var buttons = require("sdk/ui/button/action");
 var tabs = require("sdk/tabs");
-var pageMod = require("sdk/page-mod");
 
 var button = buttons.ActionButton({
   id: "mozilla-link",
@@ -15,6 +14,7 @@ var button = buttons.ActionButton({
 
 var data = require("sdk/self").data;
 var pageMod = require("sdk/page-mod");
+
 pageMod.PageMod({
   include: "*",
   contentScriptFile: data.url("content.js")
