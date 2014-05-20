@@ -67,6 +67,10 @@ function deleteDataset() {
   }).then(null, Cu.reportError);
 }
 
+function openPanel() {
+  Services.wm.getMostRecentWindow("navigator:browser").BrowserApp.loadURI("about:home?panel=" + PANEL_ID);
+}
+
 /**
  * Logic to load add-on code into the browser window.
  */
@@ -134,9 +138,7 @@ function startup(data, reason) {
     case ADDON_ENABLE:
       Home.panels.install(PANEL_ID);
       refreshDataset();
-
-      // Open the panel when the add-on is installed.
-      Services.wm.getMostRecentWindow("navigator:browser").BrowserApp.loadURI("about:home?panel=" + PANEL_ID);
+      openPanel();
       break;
 
     case ADDON_UPGRADE:
