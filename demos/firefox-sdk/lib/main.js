@@ -17,5 +17,5 @@ var data = require("sdk/self").data;
 var pageMod = require("sdk/page-mod");
 pageMod.PageMod({
   include: "*",
-  contentScriptFile: data.url("image-swap.js")
+  contentScriptFile: data.url("content.js")
 });
