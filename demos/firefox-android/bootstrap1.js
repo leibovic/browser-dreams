@@ -17,7 +17,9 @@ function unloadFromWindow(window) {
   window.NativeWindow.menu.remove(menuItemId);
 }
 
-// Boilerplate code to listen for browser windows being loaded.
+/**
+ * Boilerplate code to listen for browser windows being loaded.
+ */
 var WindowListener = {
   init: function() {
     let windows = Services.wm.getEnumerator("navigator:browser");
