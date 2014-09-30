@@ -52,10 +52,23 @@
 <section>
   <h3>Getting started with the add-on SDK</h3>
   <ul class="incremental">
-    <li><a href="https://developer.mozilla.org/en-US/Add-ons/SDK/Tutorials/Installation">Install the SDK here</a>
+    <li><a href="https://developer.mozilla.org/en-US/Add-ons/SDK/Tutorials/Installation">Install the SDK</a>
     <li><code>cfx init</code> to create a new add-on
     <li><code>cfx run</code> to test the add-on
     <li><code>require</code> statements to import JS modules
+  </ul>
+</section>
+
+<section>
+  <h2>Demo</h2>
+</section>
+
+<section>
+  <h3>Debugging your add-on</h3>
+  <ul class="incremental">
+    <li>Developer Tools > Browser Toolbox
+    <li>Search for your add-on JS file
+    <li>Set breakpoints and inspect state
   </ul>
 </section>
 
@@ -68,16 +81,32 @@
   <ul class="incremental">
     <li>JS file to handle startup and shutdown
     <li>Interact directly with browser APIs
+    <li>Special APIs for modifying native Android UI
   </ul>
 </section>
 
 <section>
   <h3>Getting started with mobile add-ons</h3>
   <ul class="incremental">
-    <li><a href="https://github.com/mozilla/firefox-for-android-addons/tree/master/boilerplate/native-ui-boilerplate">Grab some sample code here</a>
+    <li><a href="https://github.com/mozilla/firefox-for-android-addons/tree/master/boilerplate/native-ui-boilerplate">Grab some sample code</a>
     <li><code>bootstrap.js</code> for logic
     <li><code>install.rdf</code> for metadata
     <li><code>build</code> to package and test
+  </ul>
+</section>
+
+<section>
+  <h2>Demo</h2>
+</section>
+
+<section>
+  <h3>Remote debugging Firefox for Android</h3>
+  <ul class="incremental">
+    <li>Install <a href="https://developer.android.com/sdk/index.html">Android SDK</a> to get <a href="https://developer.android.com/tools/help/adb.html"><code>adb</code></a>
+    <li>Enable USB debugging on your device
+    <li>Enable remote debugging in Firefox for Android
+    <li><code>adb forward ...</code> 
+    <li>Developer Tools > Connect...
   </ul>
 </section>
 
