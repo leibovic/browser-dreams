@@ -1,173 +1,121 @@
 const { classes: Cc, interfaces: Ci, utils: Cu } = Components;
 
-Cu.import("resource://gre/modules/Home.jsm");
-Cu.import("resource://gre/modules/HomeProvider.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/Task.jsm");
 
-/**
- * Logic to control a new home panel.
- */
+const CAT_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAUCAYAAADskT9PAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAAd0SU1FB9sFGg0XBT5YnY0AAAEhSURBVEjHrVZRFoQgCHR83Wj3THImPFN7JvZjozUDpVf85ItihhFQpLlJum+47FBwWfk++ptcLITBP+U68qtOSeRQoBF4rfY6SDqHwfvgaqXY6yCJHJazjAOBkEDw1TgW9V7YS3qixAmJmfe1sHiERb8jIkkpITeM5FLLORky81GJztfb0jqISCXCnS2xSFjg2hZikPjptfKxiGo9AbfyX7ENB1mzVeBhsD5rv9CmtuFIbgeSSyLSgvurclBx5sv9VCSic4ASn4IAPLlN3+KMZpl2QEeq/LV1q1+f+i0NBhFO87zdhokirYLe+tHDqO8ErwaMbgNmd4DocYw3hdtRwT0FJJrNExeUJbiXMGa5lYDlH/6DwBUMjm+6fUZXnf75AtSJkJx49gb1AAAAAElFTkSuQmCC";
 
-const PANEL_ID = "myawesomepanel@margaretleibovic.com";
-const DATASET_ID = "myawesomedata@margaretleibovic.com";
-const PANEL_TITLE = "My awesome panel";
-const KITTENS_URL = "http://api.flickr.com/services/feeds/photos_public.gne?tags=kittens&format=json";
+var NativeWindow;
+var BrowserApp;
 
-// Used to configure home panel.
-function panelOptionsCallback() {
-  return {
-    title: PANEL_TITLE,
-    views: [{
-      type: Home.panels.View.GRID,
-      dataset: DATASET_ID
-    }]
-  };
-}
+// Keep track of IDs so that we can clean up after ourselves.
+var contextMenuId;
+var pageActionId;
 
-function fetchFlickrJson(url, onFinish) {
-  let xhr = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
-  xhr.open("GET", url, true);
-  xhr.onload = function onload(event) {
-    if (xhr.status === 200) {
-      // Handle JSONP response.
-      let response = null;
-      let jsonFlickrFeed = function(r){
-        response = r;
-      }
-      eval(xhr.responseText);
-      onFinish(response);
-    }
-  };
-  xhr.send(null);
-}
-
-function refreshDataset() {
-  fetchFlickrJson(KITTENS_URL, function(response) {
-    // Format items the way we want to store them.
-    let items = response.items.map(function(item) {
-      return {
-        url: item.link,
-        image_url: item.media.m 
-      };
-    });
-
-    Task.spawn(function() {
-      let storage = HomeProvider.getStorage(DATASET_ID);
-      yield storage.deleteAll();
-      yield storage.save(items);
-    }).then(null, Cu.reportError);
-  });
-}
-
-function deleteDataset() {
-  Task.spawn(function() {
-    let storage = HomeProvider.getStorage(DATASET_ID);
-    yield storage.deleteAll();
-  }).then(null, Cu.reportError);
-}
-
-function openPanel() {
-  Services.wm.getMostRecentWindow("navigator:browser").BrowserApp.loadURI("about:home?panel=" + PANEL_ID);
-}
-
-/**
- * Logic to load add-on code into the browser window.
- */
-
-var menuItemId;
-
+// This function loads the add-on into the global browser window. This is a XUL window that holds
+// <browser> elements, which in turn hold the normal web content windows you find in tabs.
+// You don't need to worry about this, but we need this window to get at UI APIs that depend on a window.
 function loadIntoWindow(window) {
-  menuItemId = window.NativeWindow.menu.add({
-    name: "Cats!",
-    callback: function() {
-      window.BrowserApp.addTab("https://www.google.com/search?q=cat&tbm=isch");
-    }
-  });
+  NativeWindow = window.NativeWindow;
+  contextMenuId = NativeWindow.contextmenus.add(
+    "Cat-ify!",
+    NativeWindow.contextmenus.SelectorContext("img"),
+    img => img.src = "http://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Turkish_Van_Cat.jpg/819px-Turkish_Van_Cat.jpg"
+  );
+
+  BrowserApp = window.BrowserApp;
+  BrowserApp.deck.addEventListener("pageshow", onPageShow, false);
 }
 
 function unloadFromWindow(window) {
-  window.NativeWindow.menu.remove(menuItemId);
+  NativeWindow.contextmenus.remove(contextMenuId);
+
+  BrowserApp.deck.removeEventListener("pageshow", onPageShow, false);
+}
+
+function onPageShow(event) {
+  // Ignore load events on frames and other documents.
+  let selectedTab = BrowserApp.selectedTab;
+  if (!selectedTab || event.target != selectedTab.browser.contentDocument) {
+    return;
+  }
+
+  // Remove any current page action item.
+  if (pageActionId) {
+    NativeWindow.pageactions.remove(pageActionId);
+    pageActionId = undefined;
+  }
+
+  // Only show the page action icon sometimes.
+  // (You would have a more useful check if this was a real add-on ;)
+  if (Math.random() < 0.5) {
+    return;
+  }
+
+  pageActionId = NativeWindow.pageactions.add({
+    icon: CAT_ICON,
+    title: "Cats!",
+    clickCallback: function() {
+      let doc = selectedTab.browser.contentDocument;
+      let images = doc.querySelectorAll("img");
+      for (let i = 0; i < images.length; i++) {
+        images[i].src = "http://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Turkish_Van_Cat.jpg/819px-Turkish_Van_Cat.jpg";
+      }
+    }
+  });
 }
 
 /**
- * Boilerplate code to listen for browser windows being loaded.
+ * bootstrap.js API
  */
-var WindowListener = {
-  init: function() {
-    let windows = Services.wm.getEnumerator("navigator:browser");
-    while (windows.hasMoreElements()) {
-      let domWindow = windows.getNext().QueryInterface(Ci.nsIDOMWindow);
-      loadIntoWindow(domWindow);
-    }
-    Services.wm.addListener(this);
-  },
-
-  uninit: function() {
-    Services.wm.removeListener(this);
-    let windows = Services.wm.getEnumerator("navigator:browser");
-    while (windows.hasMoreElements()) {
-      let domWindow = windows.getNext().QueryInterface(Ci.nsIDOMWindow);
-      unloadFromWindow(domWindow);
-    }
-  },
-
-  onOpenWindow: function(window) {
-    let domWindow = window.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowInternal || Ci.nsIDOMWindow);
+var windowListener = {
+  onOpenWindow: function(aWindow) {
+    // Wait for the window to finish loading
+    let domWindow = aWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowInternal || Ci.nsIDOMWindow);
     domWindow.addEventListener("load", function() {
       domWindow.removeEventListener("load", arguments.callee, false);
       loadIntoWindow(domWindow);
     }, false);
   },
-
-  onCloseWindow: function(window) {},
-
-  onWindowTitleChange: function(window, title) {}
+  
+  onCloseWindow: function(aWindow) {
+  },
+  
+  onWindowTitleChange: function(aWindow, aTitle) {
+  }
 };
 
-/**
- * bootstrap.js API
- * https://developer.mozilla.org/en-US/Add-ons/Bootstrapped_extensions
- */
-function startup(data, reason) {
-  WindowListener.init();
-
-  // Always register your panel on startup.
-  Home.panels.register(PANEL_ID, panelOptionsCallback);
-
-  switch(reason) {
-    case ADDON_INSTALL:
-    case ADDON_ENABLE:
-      Home.panels.install(PANEL_ID);
-      refreshDataset();
-      openPanel();
-      break;
-
-    case ADDON_UPGRADE:
-    case ADDON_DOWNGRADE:
-      Home.panels.update(PANEL_ID);
-      break;
+function startup(aData, aReason) {
+  // Load into any existing windows
+  let windows = Services.wm.getEnumerator("navigator:browser");
+  while (windows.hasMoreElements()) {
+    let domWindow = windows.getNext().QueryInterface(Ci.nsIDOMWindow);
+    loadIntoWindow(domWindow);
   }
 
-  // Update data once every hour.
-  HomeProvider.addPeriodicSync(DATASET_ID, 3600, refreshDataset);
+  // Load into any new windows
+  Services.wm.addListener(windowListener);
 }
 
-function shutdown(data, reason) {
-  WindowListener.uninit();
-
-  if (reason == ADDON_UNINSTALL || reason == ADDON_DISABLE) {
-    // Call removePeriodicSync only when uninstalling or disabling,
-    // because we still need periodic sync in other cases.
-    HomeProvider.removePeriodicSync(DATASET_ID);
-
-    Home.panels.uninstall(PANEL_ID);
-    deleteDataset();
+function shutdown(aData, aReason) {
+  // When the application is shutting down we normally don't have to clean
+  // up any UI changes made
+  if (aReason == APP_SHUTDOWN) {
+    return;
   }
 
-  Home.panels.unregister(PANEL_ID);
+  // Stop listening for new windows
+  Services.wm.removeListener(windowListener);
+
+  // Unload from any existing windows
+  let windows = Services.wm.getEnumerator("navigator:browser");
+  while (windows.hasMoreElements()) {
+    let domWindow = windows.getNext().QueryInterface(Ci.nsIDOMWindow);
+    unloadFromWindow(domWindow);
+  }
 }
 
-function install(data, reason) {}
+function install(aData, aReason) {
+}
 
-function uninstall(data, reason) {}
+function uninstall(aData, aReason) {
+}
