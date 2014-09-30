@@ -8,7 +8,7 @@ var ui = require("sdk/ui");
 var tabs = require("sdk/tabs");
 
 var actionButton = ui.ActionButton({
-  id: "mozilla-link",
+  id: "cat-action-button",
   label: "Cats!",
   icon: {
     "32": "./icon.png",
@@ -25,15 +25,15 @@ var panels = require("sdk/panel");
 var self = require("sdk/self");
 
 var panel = panels.Panel({
-  contentURL: self.data.url("popup.html"),
+  contentURL: self.data.url("cats.html"),
   width: 375,
   height: 465
 });
 
 // ToggleButton can toggle some state when clicked.
 var toggleButton = ui.ToggleButton({
-  id: "my-button",
-  label: "my button",
+  id: "cat-toggle-button",
+  label: "Cats!",
   icon: {
     "32": "./icon.png"
   },
