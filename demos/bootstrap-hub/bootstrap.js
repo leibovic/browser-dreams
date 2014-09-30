@@ -11,7 +11,7 @@ Cu.import("resource://gre/modules/Task.jsm");
 
 const PANEL_ID = "myawesomepanel@margaretleibovic.com";
 const DATASET_ID = "myawesomedata@margaretleibovic.com";
-const PANEL_TITLE = "My awesome panel";
+const PANEL_TITLE = "Kittens!";
 const KITTENS_URL = "http://api.flickr.com/services/feeds/photos_public.gne?tags=kittens&format=json";
 
 // Used to configure home panel.
@@ -20,7 +20,8 @@ function panelOptionsCallback() {
     title: PANEL_TITLE,
     views: [{
       type: Home.panels.View.GRID,
-      dataset: DATASET_ID
+      dataset: DATASET_ID,
+      onrefresh: refreshDataset
     }]
   };
 }
@@ -37,6 +38,8 @@ function fetchFlickrJson(url, onFinish) {
       }
       eval(xhr.responseText);
       onFinish(response);
+    } else {
+      Cu.reportError("Error loading Flickr feed: XHR status " + xhr.status);
     }
   };
   xhr.send(null);
@@ -54,8 +57,7 @@ function refreshDataset() {
 
     Task.spawn(function() {
       let storage = HomeProvider.getStorage(DATASET_ID);
-      yield storage.deleteAll();
-      yield storage.save(items);
+      yield storage.save(items, { replace: true });
     }).then(null, Cu.reportError);
   });
 }
@@ -72,66 +74,10 @@ function openPanel() {
 }
 
 /**
- * Logic to load add-on code into the browser window.
- */
-
-var menuItemId;
-
-function loadIntoWindow(window) {
-  menuItemId = window.NativeWindow.menu.add({
-    name: "Cats!",
-    callback: function() {
-      window.BrowserApp.addTab("https://www.google.com/search?q=cat&tbm=isch");
-    }
-  });
-}
-
-function unloadFromWindow(window) {
-  window.NativeWindow.menu.remove(menuItemId);
-}
-
-/**
- * Boilerplate code to listen for browser windows being loaded.
- */
-var WindowListener = {
-  init: function() {
-    let windows = Services.wm.getEnumerator("navigator:browser");
-    while (windows.hasMoreElements()) {
-      let domWindow = windows.getNext().QueryInterface(Ci.nsIDOMWindow);
-      loadIntoWindow(domWindow);
-    }
-    Services.wm.addListener(this);
-  },
-
-  uninit: function() {
-    Services.wm.removeListener(this);
-    let windows = Services.wm.getEnumerator("navigator:browser");
-    while (windows.hasMoreElements()) {
-      let domWindow = windows.getNext().QueryInterface(Ci.nsIDOMWindow);
-      unloadFromWindow(domWindow);
-    }
-  },
-
-  onOpenWindow: function(window) {
-    let domWindow = window.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowInternal || Ci.nsIDOMWindow);
-    domWindow.addEventListener("load", function() {
-      domWindow.removeEventListener("load", arguments.callee, false);
-      loadIntoWindow(domWindow);
-    }, false);
-  },
-
-  onCloseWindow: function(window) {},
-
-  onWindowTitleChange: function(window, title) {}
-};
-
-/**
  * bootstrap.js API
  * https://developer.mozilla.org/en-US/Add-ons/Bootstrapped_extensions
  */
 function startup(data, reason) {
-  WindowListener.init();
-
   // Always register your panel on startup.
   Home.panels.register(PANEL_ID, panelOptionsCallback);
 
@@ -140,7 +86,6 @@ function startup(data, reason) {
     case ADDON_ENABLE:
       Home.panels.install(PANEL_ID);
       refreshDataset();
-      openPanel();
       break;
 
     case ADDON_UPGRADE:
@@ -149,18 +94,14 @@ function startup(data, reason) {
       break;
   }
 
-  // Update data once every hour.
-  HomeProvider.addPeriodicSync(DATASET_ID, 3600, refreshDataset);
+   // Open the panel when the add-on is first installed.
+  if (reason == ADDON_INSTALL) {
+    openPanel();
+  }
 }
 
 function shutdown(data, reason) {
-  WindowListener.uninit();
-
   if (reason == ADDON_UNINSTALL || reason == ADDON_DISABLE) {
-    // Call removePeriodicSync only when uninstalling or disabling,
-    // because we still need periodic sync in other cases.
-    HomeProvider.removePeriodicSync(DATASET_ID);
-
     Home.panels.uninstall(PANEL_ID);
     deleteDataset();
   }
