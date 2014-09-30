@@ -1,53 +1,85 @@
-var { ToggleButton } = require("sdk/ui/button/toggle");
-var panels = require("sdk/panel");
-var self = require("sdk/self");
+// For even more APIs and examples, see:
+// https://developer.mozilla.org/en-US/Add-ons/SDK/High-Level_APIs
 
-var button = ToggleButton({
-  id: "my-button",
-  label: "my button",
-  icon: {
-    "32": "./icon.png"
-  },
-  onChange: handleChange
-});
+// ----------------------------------------------------------------------------
+// 1. Creating a button that opens a tab when clicked.
 
-var panel = panels.Panel({
-  contentURL: self.data.url("popup.html")
-});
-
-function handleChange(state) {
-  if (state.checked) {
-    panel.show({
-      width: 375,
-      height: 465,
-      position: {
-        top: 0,
-        right: 0
-      }
-    });
-  }
-}
-
-var { ActionButton } = require("sdk/ui/button/action");
+var ui = require("sdk/ui");
 var tabs = require("sdk/tabs");
 
-var button = ActionButton({
+var actionButton = ui.ActionButton({
   id: "mozilla-link",
   label: "Cats!",
   icon: {
     "32": "./icon.png",
   },
-  onClick: handleClick
+  onClick: function(state) {
+    tabs.open("https://www.google.com/search?q=cat&tbm=isch");
+  }
 });
 
-function handleClick(state) {
-  tabs.open("https://www.google.com/search?q=cat&tbm=isch");
-}
+// ----------------------------------------------------------------------------
+// 2. Creating a button that toggles a panel when clicked.
 
-var data = require("sdk/self").data;
+var panels = require("sdk/panel");
+var self = require("sdk/self");
+
+var panel = panels.Panel({
+  contentURL: self.data.url("popup.html"),
+  width: 375,
+  height: 465
+});
+
+// ToggleButton can toggle some state when clicked.
+var toggleButton = ui.ToggleButton({
+  id: "my-button",
+  label: "my button",
+  icon: {
+    "32": "./icon.png"
+  },
+  onChange: function(state) {
+    if (state.checked) {
+      panel.show({ position: toggleButton });
+    }
+  }
+});
+
+// ----------------------------------------------------------------------------
+// 3. Add a keyboard shortcut to show the panel.
+
+var hotkeys = require("sdk/hotkeys");
+
+var showHotKey = hotkeys.Hotkey({
+  combo: "accel-shift-o",
+  onPress: function() {
+    if (panel.isShowing) {
+      panel.hide();
+    } else {
+      panel.show();
+    }
+  }
+});
+
+// ----------------------------------------------------------------------------
+// 4. Creating a content script to modify page content.
+
 var pageMod = require("sdk/page-mod");
 
 pageMod.PageMod({
   include: "*",
-  contentScriptFile: data.url("content.js")
+  contentScriptFile: self.data.url("content.js")
+});
+
+
+// ----------------------------------------------------------------------------
+// 5. Add a context menu to certain kinds of elements.
+
+var contextMenu = require("sdk/context-menu");
+
+var menuItem = contextMenu.Item({
+  label: "Cat-ify",
+  context: contextMenu.SelectorContext("img"),
+  contentScript: 'self.on("click", function (img) {' +
+                 '  img.src = "http://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Turkish_Van_Cat.jpg/819px-Turkish_Van_Cat.jpg"' +
+                 '});'
 });
