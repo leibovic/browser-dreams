@@ -1,14 +1,8 @@
 # Build the browser of your dreams!
 
-Slides for a Hackbright Academy tech talk. Built with [dzslides](https://github.com/paulrouget/dzslides).
+Built with [dzslides](https://github.com/paulrouget/dzslides).
 
 ## Reference
-
-###Chrome Extensions
-
-* https://developer.chrome.com/extensions/overview
-* https://developer.chrome.com/extensions/manifest
-* https://developer.chrome.com/extensions/api_index
 
 ### Firefox Add-on SDK
 

@@ -28,45 +28,70 @@
 </section>
 
 <section>
-  <h2 style="margin-top: 100px;">All major browsers support extensions</h2>
-  <img src="browsers.png" style="width: 100%;">
+  <h2>You can extend your browser!</h2>
 </section>
 
 <section>
-  <h3>Web based extensions</h3>
+  <h3>Extensions are built with web technologies</h3>
   <ul class="incremental">
-    <li>Manifest file
     <li>HTML/JS/CSS
     <li>Special APIs
-  </ul>
-</section>
-
-<section>
-  <h3>Chrome Extensions</h3>
-  <ul class="incremental">
-    <li><code>manifest.json</code>
-    <li>HTML/JS/CSS
+    <li>Manifest file
   </ul>
 </section>
 
 <section>
   <h3>Firefox Add-on SDK</h3>
   <ul class="incremental">
-    <li><code>cfx</code> command line tool
+    <li>JS APIs for building Firefox add-ons
+    <li>Tools for creating and testing add-ons
     <li>JS modules
   </ul>
 </section>
 
 <section>
-  <h3>Firefox Bootstrap Add-ons</h3>
+  <h3>Getting started with the add-on SDK</h3>
   <ul class="incremental">
-    <li><code>install.rdf</code>
-    <li><code>bootstrap.js</code>
+    <li><a href="https://developer.mozilla.org/en-US/Add-ons/SDK/Tutorials/Installation">Install the SDK here</a>
+    <li><code>cfx init</code> to create a new add-on
+    <li><code>cfx run</code> to test the add-on
+    <li><code>require</code> statements to import JS modules
   </ul>
 </section>
 
 <section>
-  <h2>Control how you experience the web!</h2>
+  <h2>Demo</h2>
+</section>
+
+<section>
+  <h3>Bootstrap Add-ons for Firefox for Android</h3>
+  <ul class="incremental">
+    <li>JS file to handle startup and shutdown
+    <li>Interact directly with browser APIs
+  </ul>
+</section>
+
+<section>
+  <h3>Getting started with mobile add-ons</h3>
+  <ul class="incremental">
+    <li><a href="https://github.com/mozilla/firefox-for-android-addons/tree/master/boilerplate/native-ui-boilerplate">Grab some sample code here</a>
+    <li><code>bootstrap.js</code> for logic
+    <li><code>install.rdf</code> for metadata
+    <li><code>build</code> to package and test
+  </ul>
+</section>
+
+<section>
+  <h2>Demo</h2>
+</section>
+
+<section>
+  <h3>Want to do more?</h3>
+  <ul class="incremental">
+    <li><a href="http://whatcanidoformozilla.org">http://whatcanidoformozilla.org</a>
+    <li>Hack on <a href="https://wiki.mozilla.org/Firefox/Get_Involved">desktop Firefox</a>
+    <li>Hack on <a href="https://wiki.mozilla.org/Mobile/Get_Involved">Firefox for Android</a>
+  </ul>
 </section>
 
 
@@ -207,6 +232,12 @@
   #progress-bar {
     height: 2px;
     background: #AAA;
+  }
+
+  .center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
   }
 </style>
 
